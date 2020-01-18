@@ -105,5 +105,9 @@ repositories {
     flatDir {
         dirs rootProject.file('libs')
     }
+
+    maven {
+        url "https://ftclib.bintray.com/FTCLib"
+    }
 }
 apply from: 'build.release.gradle'
