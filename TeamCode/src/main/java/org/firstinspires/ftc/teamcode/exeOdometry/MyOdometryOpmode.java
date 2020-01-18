@@ -40,6 +40,8 @@ public class MyOdometryOpmode extends LinearOpMode {
         globalPositionUpdate.reverseRightEncoder();
         globalPositionUpdate.reverseNormalEncoder();
 
+        goToAbsolutePosition(0, 24, .5, 0, 1);
+
         while(opModeIsActive()){
             //Display Global (x, y, theta) coordinates
             telemetry.addData("X Position", globalPositionUpdate.returnXCoordinate() / COUNTS_PER_INCH);
@@ -57,6 +59,82 @@ public class MyOdometryOpmode extends LinearOpMode {
         //Stop the thread
         globalPositionUpdate.stop();
 
+    }
+
+    public void goToAbsolutePosition(double targetXPosition, double targetYPosition, double power, double desiredOrientation, double allowableDistanceError) {
+
+        targetXPosition = targetXPosition * COUNTS_PER_INCH;
+        targetYPosition = targetYPosition * COUNTS_PER_INCH;
+        allowableDistanceError = allowableDistanceError * COUNTS_PER_INCH;
+
+        double distanceToXPosition = targetXPosition - globalPositionUpdate.returnXCoordinate();
+        double distanceToYPosition = targetYPosition - globalPositionUpdate.returnYCoordinate();
+
+        double distance = Math.hypot(distanceToXPosition, distanceToYPosition);
+
+        while (opModeIsActive() && distance > allowableDistanceError) {
+
+            distance = Math.hypot(distanceToXPosition, distanceToYPosition);
+
+            distanceToXPosition = targetXPosition - globalPositionUpdate.returnXCoordinate();
+            distanceToYPosition = targetYPosition - globalPositionUpdate.returnYCoordinate();
+
+            double movementAngle = Math.toDegrees(Math.atan2(distanceToXPosition, distanceToYPosition));
+
+            double movementXCompenent = calculateX(movementAngle, power);
+            double movementYCompenent = calculateY(movementAngle, power);
+            double pivotCorrection = desiredOrientation - globalPositionUpdate.returnOrientation();
+
+        }
+
+    }
+
+    public void goToRelativePosition(double targetXPosition, double targetYPosition, double power, double desiredOrientation, double allowableDistanceError) {
+
+        targetXPosition = targetXPosition * COUNTS_PER_INCH;
+        targetYPosition = targetYPosition * COUNTS_PER_INCH;
+        allowableDistanceError = allowableDistanceError * COUNTS_PER_INCH;
+
+        double distanceToXPosition = targetXPosition;
+        double distanceToYPosition = targetYPosition;
+
+        double distance = Math.hypot(distanceToXPosition, distanceToYPosition);
+
+        while (opModeIsActive() && distance > allowableDistanceError) {
+
+            distance = Math.hypot(distanceToXPosition, distanceToYPosition);
+
+            distanceToXPosition = targetXPosition;
+            distanceToYPosition = targetYPosition;
+
+            double movementAngle = Math.toDegrees(Math.atan2(distanceToXPosition, distanceToYPosition));
+
+            double movementXCompenent = calculateX(movementAngle, power);
+            double movementYCompenent = calculateY(movementAngle, power);
+            double pivotCorrection = desiredOrientation;
+
+        }
+
+    }
+
+    /**
+     * Calculate the power in the x direction
+     * @param desiredAngle angle on the x axis
+     * @param speed robot's speed
+     * @return the x vector
+     */
+    private double calculateX(double desiredAngle, double speed) {
+        return Math.sin(Math.toRadians(desiredAngle)) * speed;
+    }
+
+    /**
+     * Calculate the power in the y direction
+     * @param desiredAngle angle on the y axis
+     * @param speed robot's speed
+     * @return the y vector
+     */
+    private double calculateY(double desiredAngle, double speed) {
+        return Math.cos(Math.toRadians(desiredAngle)) * speed;
     }
 
     private void initDriveHardwareMap(String rfName, String rbName, String lfName, String lbName, String vlEncoderName, String vrEncoderName, String hEncoderName){
@@ -101,23 +179,4 @@ public class MyOdometryOpmode extends LinearOpMode {
         telemetry.update();
     }
 
-    /**
-     * Calculate the power in the x direction
-     * @param desiredAngle angle on the x axis
-     * @param speed robot's speed
-     * @return the x vector
-     */
-    private double calculateX(double desiredAngle, double speed) {
-        return Math.sin(Math.toRadians(desiredAngle)) * speed;
-    }
-
-    /**
-     * Calculate the power in the y direction
-     * @param desiredAngle angle on the y axis
-     * @param speed robot's speed
-     * @return the y vector
-     */
-    private double calculateY(double desiredAngle, double speed) {
-        return Math.cos(Math.toRadians(desiredAngle)) * speed;
-    }
 }
