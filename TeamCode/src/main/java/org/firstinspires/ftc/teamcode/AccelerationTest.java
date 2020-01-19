@@ -71,7 +71,46 @@ public class AccelerationTest extends LinearOpMode {
 
     }
 
-    public void continuousAccelDecel() {
+    public void continuousAccelDecel(int targetPosition, double maxSpeed) {
+        motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        motor.setTargetPosition(targetPosition);
+
+        double accelerationDistance = motor.getTargetPosition() / 2;
+        double decelerationDistance = motor.getTargetPosition() - accelerationDistance;
+        double power = .1;
+
+        motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        while (opModeIsActive() && motor.getCurrentPosition() < motor.getTargetPosition()) {
+
+            if (motor.getCurrentPosition() < accelerationDistance) {
+                power += .05;
+
+                if (power < .1) {
+                    power = .1;
+                } else if (power > maxSpeed) {
+                    power = maxSpeed;
+                }
+
+                motor.setPower(power);
+
+            } else if (motor.getCurrentPosition() > accelerationDistance) {
+                power -= .05;
+
+                if (power < .1) {
+                    power = .1;
+                } else if (power > maxSpeed) {
+                    power = maxSpeed;
+                }
+
+                motor.setPower(power);
+
+            }
+
+        }
+
+
 
     }
 
