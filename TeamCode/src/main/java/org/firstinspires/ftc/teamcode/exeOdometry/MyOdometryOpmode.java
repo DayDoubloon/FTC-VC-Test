@@ -81,9 +81,15 @@ public class MyOdometryOpmode extends LinearOpMode {
 
             double movementAngle = Math.toDegrees(Math.atan2(distanceToXPosition, distanceToYPosition));
 
-            double movementXCompenent = calculateX(movementAngle, power);
-            double movementYCompenent = calculateY(movementAngle, power);
+            double movementXComponent = calculateX(movementAngle, power);
+            double movementYComponent = calculateY(movementAngle, power);
             double pivotCorrection = desiredOrientation - globalPositionUpdate.returnOrientation();
+            double pivotComponent = Math.toRadians(pivotCorrection) * power;
+            
+            right_front.setPower(Range.clip(1, -1, movementXComponent + movementYComponent + pivotComponent));
+            right_back.setPower(Range.clip(1, -1, movementXComponent - movementYComponent + pivotComponent));
+            left_front.setPower(Range.clip(1, -1, movementXComponent - movementYComponent - pivotComponent));
+            left_back.setPower(Range.clip(1, -1, movementXComponent + movementYComponent - pivotComponent));
 
         }
 
@@ -109,8 +115,8 @@ public class MyOdometryOpmode extends LinearOpMode {
 
             double movementAngle = Math.toDegrees(Math.atan2(distanceToXPosition, distanceToYPosition));
 
-            double movementXCompenent = calculateX(movementAngle, power);
-            double movementYCompenent = calculateY(movementAngle, power);
+            double movementXComponent = calculateX(movementAngle, power);
+            double movementYComponent = calculateY(movementAngle, power);
             double pivotCorrection = desiredOrientation;
 
         }
