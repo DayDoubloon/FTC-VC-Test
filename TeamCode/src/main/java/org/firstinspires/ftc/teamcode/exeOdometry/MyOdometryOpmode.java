@@ -86,10 +86,10 @@ public class MyOdometryOpmode extends LinearOpMode {
             double pivotCorrection = desiredOrientation - globalPositionUpdate.returnOrientation();
             double pivotComponent = Math.toRadians(pivotCorrection) * power;
             
-            right_front.setPower(Range.clip(1, -1, movementXComponent + movementYComponent + pivotComponent));
-            right_back.setPower(Range.clip(1, -1, movementXComponent - movementYComponent + pivotComponent));
-            left_front.setPower(Range.clip(1, -1, movementXComponent - movementYComponent - pivotComponent));
-            left_back.setPower(Range.clip(1, -1, movementXComponent + movementYComponent - pivotComponent));
+            right_front.setPower(movementXComponent - movementYComponent + pivotComponent);
+            right_back.setPower(movementXComponent + movementYComponent + pivotComponent);
+            left_front.setPower(movementXComponent + movementYComponent - pivotComponent);
+            left_back.setPower(movementXComponent - movementYComponent - pivotComponent);
 
         }
 
