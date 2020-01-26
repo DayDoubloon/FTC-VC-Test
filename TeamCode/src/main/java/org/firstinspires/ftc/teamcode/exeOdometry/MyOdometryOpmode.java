@@ -95,6 +95,7 @@ public class MyOdometryOpmode extends LinearOpMode {
 
     }
 
+    /*
     public void goToRelativePosition(double targetXPosition, double targetYPosition, double power, double desiredOrientation, double allowableDistanceError) {
 
         targetXPosition = targetXPosition * COUNTS_PER_INCH;
@@ -118,10 +119,17 @@ public class MyOdometryOpmode extends LinearOpMode {
             double movementXComponent = calculateX(movementAngle, power);
             double movementYComponent = calculateY(movementAngle, power);
             double pivotCorrection = desiredOrientation;
+            double pivotComponent = Math.toRadians(pivotCorrection) * power;
+
+            right_front.setPower(movementXComponent - movementYComponent + pivotComponent);
+            right_back.setPower(movementXComponent + movementYComponent + pivotComponent);
+            left_front.setPower(movementXComponent + movementYComponent - pivotComponent);
+            left_back.setPower(movementXComponent - movementYComponent - pivotComponent);
 
         }
 
     }
+    */
 
     /**
      * Calculate the power in the x direction
