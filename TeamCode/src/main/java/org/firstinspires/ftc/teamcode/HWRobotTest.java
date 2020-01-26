@@ -1,21 +1,25 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
+//import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 public class HWRobotTest {
 
-    /** Setup */
-    /**-------------------------------------------------------------------------------------------*/
+    /*
+     * Setup
+     */
+    /*--------------------------------------------------------------------------------------------*/
 
-    // Declare Public Hardware Devices
+    // Declare drive motors
     public DcMotor FLDrive = null;
     public DcMotor FRDrive = null;
     public DcMotor BLDrive = null;
     public DcMotor BRDrive = null;
+
+    // Declare collector motors
     public DcMotor BackCollectL = null;
     public DcMotor BackCollectR = null;
     public DcMotor FrontCollectL = null;
@@ -36,11 +40,16 @@ public class HWRobotTest {
     }
 
 
+    /*
+     * Initializations
+     */
+    /*--------------------------------------------------------------------------------------------*/
 
-    /** Initializations */
-    /**-------------------------------------------------------------------------------------------*/
-
-    // Initialize motors and servos, set modes
+    /**
+     * Initializes motors and servos
+     * assigns to names in config, sets modes, and sets directions
+     * @param ahwMap allows function to use hardwareMap, input hardwareMap into function when using
+     */
     public void init(HardwareMap ahwMap) {
 
         hwMap = ahwMap;
@@ -84,8 +93,12 @@ public class HWRobotTest {
     }
 
 
-    // set different modes for drive motors
-    // reset, position, withEncode, withoutEncode, brake
+    /**
+     * Sets different drive modes for drive motors depending on what is imputed
+     * @param mode "reset" - STOP_AND_RESET_ENCODER, "position" - RUN_TO_POSITION,
+     *             "withEncode" - RUN_USING_ENCODER, "withoutEncode" - RUN_WITHOUT_ENCODER,
+     *             "brake" - ZeroPowerBehavior.BRAKE
+     */
     public void setDriveMode(String mode) {
 
         // check what was imputed
@@ -137,10 +150,16 @@ public class HWRobotTest {
 
 
 
-    /** Utility */
-    /**-------------------------------------------------------------------------------------------*/
+    /*
+     * Utility
+     */
+    /*--------------------------------------------------------------------------------------------*/
 
-    // convert inches to ticks for linear movement
+    /**
+     * Converts inches into number of encoder ticks
+     * @param inches number of inches to be converted
+     * @return number of encoder ticks calculated from inches
+     */
     public int inchTick(double inches) {
 
         // return wheel ticks per revolution multiplied by number of revolutions (inches / circumference)
@@ -149,7 +168,11 @@ public class HWRobotTest {
     }
 
 
-    // convert degrees to ticks for rotation
+    /**
+     * Converts degrees into number of encoder ticks
+     * @param degrees number of degrees to be converted
+     * @return number of encoder ticks calculated from inches
+     */
     public int degreeTick(double degrees) {
 
         // return wheel ticks by multiplying degrees by 8
@@ -158,7 +181,10 @@ public class HWRobotTest {
     }
 
 
-    // check if drive motors are busy (running to their target position)
+    /**
+     * Checks to see if any drive motors are busy
+     * @return returns true if any are busy
+     */
     public boolean driveMotorsBusy() {
 
         // return in any drive motors are busy
@@ -167,7 +193,13 @@ public class HWRobotTest {
     }
 
 
-    // set powers for motors
+    /**
+     * Set all motors of a certain group to a certain power
+     * @param motorType the type of motors to set power for
+     *                  "drive" - drive motors
+     *                  "collector" - collector motors
+     * @param power power for motors to run at
+     */
     public void setEqualPower(String motorType, double power) {
 
         // check what was imputed
@@ -195,14 +227,20 @@ public class HWRobotTest {
 
 
 
-    /** Autonomous */
-    /**-------------------------------------------------------------------------------------------*/
+    /*
+     * Autonomous
+     */
+    /*--------------------------------------------------------------------------------------------*/
 
-    // drive with encoders, input:
-    // mode (forward, sideways, rotation),
-    // inchesOrDegrees (number of inches or degrees),
-    // maxSpeed (max speed the robot could reach),
-    // opModeActive (input opModeIsActive() to check if the opMode is active)
+    /**
+     * Drive using encoders, can do forward/back, side-to-side and rotation but only one at a time
+     * @param mode "forward" - drives forward or backwards, input negative inchesOrDegrees for backwards
+     *             "sideways" - drives left or right, input negative inchesOrDegrees for left
+     *             "rotation" - rotates left or right, input negative inchesOrDegrees for left
+     * @param inchesOrDegrees inches or degrees to be traveled, make this negative not maxSpeed
+     * @param maxSpeed maximum speed robot can go to, this will not always be reached
+     * @param opModeActive input opModeIsActive() when using to check if the op mode is active
+     */
     public void encoderDrive(String mode, double inchesOrDegrees, double maxSpeed, boolean opModeActive) {
 
         // stop and reset encoders using setDriveMode()
@@ -302,15 +340,20 @@ public class HWRobotTest {
     }
 
 
-    /** TeleOp */
-    /**-------------------------------------------------------------------------------------------*/
 
-    // mecanum drive for teleOp, input:
-    // G1RX (gamepad right stick x),
-    // G1RY (gamepad right stick y),
-    // G1LX (gamepad left stick x),
-    // G1LT (gamepad left stick trigger),
-    // powerScale (what % of power to give when trigger pressed)
+    /*
+     * TeleOp
+     */
+    /*--------------------------------------------------------------------------------------------*/
+
+    /**
+     * Mecanum driving for driver control
+     * @param G1RX gamepad right stick x, controls side-to-side movement
+     * @param G1RY gamepad right stick y, controls forward/backward movement
+     * @param G1LX gamepad left stick x, controls left/right rotation
+     * @param G1LT gamepad left trigger, if pressed the speed will be reduced by powerScale
+     * @param powerScale % to multiply powers by to reduce speed of the robot
+     */
     public void mecanumDrive(double G1RX, double G1RY, double G1LX, double G1LT, double powerScale) {
 
         // set up powerFactor variable
@@ -334,4 +377,3 @@ public class HWRobotTest {
 
 
 }
-
