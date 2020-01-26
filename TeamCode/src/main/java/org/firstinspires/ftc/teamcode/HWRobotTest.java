@@ -226,6 +226,17 @@ public class HWRobotTest {
     }
 
 
+    /**
+     * Returns quotient as an int without the remainder
+     * @param dividend number to be divided
+     * @param divisor number dividing by
+     * @return quotient of dividend / divisor without the remainder
+     */
+    public int returnIntQuotient(double dividend, double divisor) {
+        return (int) ((dividend / divisor) - ((dividend % divisor) / divisor));
+    }
+
+
 
     /*
      * Autonomous
@@ -299,6 +310,9 @@ public class HWRobotTest {
         // set the minimum speed to .1
         double minSpeed = .1;
 
+        // set the amout power will increase by every 45 ticks
+        double powerIncrease = .05;
+
         // set the initial value of power to the value of minSpeed
         double power = minSpeed;
 
@@ -312,14 +326,14 @@ public class HWRobotTest {
             // (if the robot has not reached the halfway point yet)
             if (Math.abs(FLDrive.getCurrentPosition()) < accelerationDistance) {
 
-                // increase power by .01
-                power += .01;
+                // increase power by .05 for every 45 ticks the robot travels (~1 inch)
+                power += powerIncrease * returnIntQuotient(FLDrive.getCurrentPosition(), 45);
 
             // else if the motor is past the halfway point
             } else if (Math.abs(FLDrive.getCurrentPosition()) > accelerationDistance) {
 
-                // decrease power by .01
-                power -= .01;
+                // decrease power by .05 for every 45 ticks the robot travels (~1 inch)
+                power -= powerIncrease * returnIntQuotient(FLDrive.getCurrentPosition(), 45);
 
             }
 
