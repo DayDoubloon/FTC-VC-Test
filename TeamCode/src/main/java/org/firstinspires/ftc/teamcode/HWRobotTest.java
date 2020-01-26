@@ -1,72 +1,97 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 public class HWRobotTest {
 
-    //Declare Public Hardware Devices
+    /** Setup */
+    /**-------------------------------------------------------------------------------------------*/
+
+    // Declare Public Hardware Devices
     public DcMotor FLDrive = null;
     public DcMotor FRDrive = null;
     public DcMotor BLDrive = null;
     public DcMotor BRDrive = null;
+    public DcMotor BackCollectL = null;
+    public DcMotor BackCollectR = null;
+    public DcMotor FrontCollectL = null;
+    public DcMotor FrontCollectR = null;
 
-    //Private hw members
+    // Private hw members
     HardwareMap hwMap = null;
     private ElapsedTime runtime = new ElapsedTime();
 
-    //Declare variables
+    // Declare variables
     double wheelDiameter = 4;
     double wheelCircumference = wheelDiameter * Math.PI;
     int ticksPerRotation = 560;
 
-    //Constructor
+    // Constructor
     public HWRobotTest() {
 
     }
 
-    /* Initializations */
-    /*--------------------------------------------------------------------------------------------*/
 
-    //Initialize motors and servos, set modes
+
+    /** Initializations */
+    /**-------------------------------------------------------------------------------------------*/
+
+    // Initialize motors and servos, set modes
     public void init(HardwareMap ahwMap) {
 
         hwMap = ahwMap;
 
-        //Define and Initialize Motors
+        // Define and Initialize Drive Motors
         FLDrive = hwMap.get(DcMotor.class, "FLMotor");
         FRDrive = hwMap.get(DcMotor.class, "FRMotor");
         BLDrive = hwMap.get(DcMotor.class, "BLMotor");
         BRDrive = hwMap.get(DcMotor.class, "BRMotor");
 
-        //Reverse Motors
+        // Define and Initialize collector Motors
+        BackCollectL = hwMap.get(DcMotor.class, "BackCollectL");
+        BackCollectR = hwMap.get(DcMotor.class, "BackCollectR");
+        FrontCollectL = hwMap.get(DcMotor.class, "FrontCollectL");
+        FrontCollectR = hwMap.get(DcMotor.class, "FrontCollectR");
+
+        // Reverse Drive Motors
         FLDrive.setDirection(DcMotor.Direction.REVERSE);
         FRDrive.setDirection(DcMotor.Direction.FORWARD);
         BLDrive.setDirection(DcMotor.Direction.REVERSE);
         BRDrive.setDirection(DcMotor.Direction.FORWARD);
 
-        //Set powers to 0
+        // Reverse Collector Motors
+        BackCollectL.setDirection(DcMotor.Direction.REVERSE);
+        BackCollectR.setDirection(DcMotor.Direction.FORWARD);
+        FrontCollectL.setDirection(DcMotor.Direction.REVERSE);
+        FrontCollectR.setDirection(DcMotor.Direction.FORWARD);
+
+        // Set powers to 0
         FLDrive.setPower(0);
         FRDrive.setPower(0);
         BLDrive.setPower(0);
         BRDrive.setPower(0);
 
-        //set to run using encoders
+        // set to run using encoders
         setDriveMode("withEncode");
 
-        //set zero power behavior to brake
+        // set zero power behavior to brake
         setDriveMode("brake");
 
     }
 
 
+    // set different modes for drive motors
+    // reset, position, withEncode, withoutEncode, brake
     public void setDriveMode(String mode) {
 
-        //check what was imputed
+        // check what was imputed
         switch(mode) {
 
+            // stop and reset encoders
             case "reset":
                 FLDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 FRDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -74,6 +99,7 @@ public class HWRobotTest {
                 BRDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 break;
 
+            // set motors to run to position
             case "position":
                 FLDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 FRDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -81,6 +107,7 @@ public class HWRobotTest {
                 BRDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 break;
 
+            // set motors to run using encoders
             case "withEncode":
                 FLDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 FRDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -88,6 +115,7 @@ public class HWRobotTest {
                 BRDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 break;
 
+            // set motors to run without encoders
             case "withoutEncode":
                 FLDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 FRDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -95,6 +123,7 @@ public class HWRobotTest {
                 BRDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 break;
 
+            // set zero power behavior to brake
             case "brake":
                 FLDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
                 FRDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -108,37 +137,85 @@ public class HWRobotTest {
 
 
 
-    /* Utility */
-    /*--------------------------------------------------------------------------------------------*/
+    /** Utility */
+    /**-------------------------------------------------------------------------------------------*/
 
-    //convert inches to ticks for linear movement
+    // convert inches to ticks for linear movement
     public int inchTick(double inches) {
+
+        // return wheel ticks per revolution multiplied by number of revolutions (inches / circumference)
         return((int) ((inches / wheelCircumference) * ticksPerRotation));
+
     }
 
 
-    //convert degrees to ticks for rotation
+    // convert degrees to ticks for rotation
     public int degreeTick(double degrees) {
+
+        // return wheel ticks by multiplying degrees by 8
         return((int) (degrees * 8));
+
     }
 
 
-    //check if drive motors are busy
+    // check if drive motors are busy (running to their target position)
     public boolean driveMotorsBusy() {
+
+        // return in any drive motors are busy
         return(FLDrive.isBusy() || FRDrive.isBusy() || BLDrive.isBusy() || BRDrive.isBusy());
+
+    }
+
+
+    // set powers for motors
+    public void setEqualPower(String motorType, double power) {
+
+        // check what was imputed
+        switch(motorType) {
+
+            // set power of drive motors to power
+            case "drive":
+                FLDrive.setPower(power);
+                FRDrive.setPower(power);
+                BLDrive.setPower(power);
+                BRDrive.setPower(power);
+                break;
+
+            // set power of collect motors to power
+            case "collect":
+                BackCollectL.setPower(power);
+                BackCollectR.setPower(power);
+                FrontCollectL.setPower(power / 2);
+                FrontCollectR.setPower(power / 2);
+                break;
+
+        }
+
     }
 
 
 
-    /* Autonomous */
-    /*--------------------------------------------------------------------------------------------*/
+    /** Autonomous */
+    /**-------------------------------------------------------------------------------------------*/
 
+    // drive with encoders, input:
+    // mode (forward, sideways, rotation),
+    // inchesOrDegrees (number of inches or degrees),
+    // maxSpeed (max speed the robot could reach),
+    // opModeActive (input opModeIsActive() to check if the opMode is active)
     public void encoderDrive(String mode, double inchesOrDegrees, double maxSpeed, boolean opModeActive) {
 
+        // stop and reset encoders using setDriveMode()
         setDriveMode("reset");
+
+        // set up int ticks to hold number of ticks
         int ticks;
 
+        // switch how the tick counts are assigned based on what mode is imputed
         switch(mode) {
+
+            // if "forward" is imputed,
+            // convert inchesOrDegrees with inchTick() and assign ticks in the forward pattern
             case "forward":
                 ticks = inchTick(inchesOrDegrees);
                 FLDrive.setTargetPosition(ticks);
@@ -147,6 +224,8 @@ public class HWRobotTest {
                 BRDrive.setTargetPosition(ticks);
                 break;
 
+            // if "sideways" is imputed,
+            // convert inchesOrDegrees with inchTick() and assign ticks in the sideways pattern
             case "sideways":
                 ticks = inchTick(inchesOrDegrees);
                 FLDrive.setTargetPosition(ticks);
@@ -155,6 +234,8 @@ public class HWRobotTest {
                 BRDrive.setTargetPosition(ticks);
                 break;
 
+            //if "rotation" is imputed,
+            // convert inchesOrDegrees with degreeTick() and assign ticks in the rotation pattern
             case "rotation":
                 ticks = degreeTick(inchesOrDegrees);
                 FLDrive.setTargetPosition(ticks);
@@ -163,6 +244,8 @@ public class HWRobotTest {
                 BRDrive.setTargetPosition(-ticks);
                 break;
 
+            // if incorrect mode is imputed,
+            // default to no movement
             default:
                 ticks = 0;
                 FLDrive.setTargetPosition(ticks);
@@ -172,59 +255,76 @@ public class HWRobotTest {
 
         }
 
+        // set the distance to accelerate to be always positive and half of the total distance
         double accelerationDistance = Math.abs(ticks / 2);
+
+        // set the minimum speed to .1
         double minSpeed = .1;
+
+        // set the initial value of power to the value of minSpeed
         double power = minSpeed;
 
+        // set the drive motors to run to position
         setDriveMode("position");
 
+        // run while the opMode is active and the motors are busy
         while (opModeActive && driveMotorsBusy()) {
 
+            // if the absolute value of the current position is less than the acceleration distance
+            // (if the robot has not reached the halfway point yet)
             if (Math.abs(FLDrive.getCurrentPosition()) < accelerationDistance) {
+
+                // increase power by .01
                 power += .01;
-                power = Range.clip(power, minSpeed, maxSpeed);
 
-                FLDrive.setPower(power);
-                FRDrive.setPower(power);
-                BLDrive.setPower(power);
-                BRDrive.setPower(power);
-
+            // else if the motor is past the halfway point
             } else if (Math.abs(FLDrive.getCurrentPosition()) > accelerationDistance) {
-                power -= .01;
-                power = Range.clip(power, minSpeed, maxSpeed);
 
-                FLDrive.setPower(power);
-                FRDrive.setPower(power);
-                BLDrive.setPower(power);
-                BRDrive.setPower(power);
+                // decrease power by .01
+                power -= .01;
 
             }
 
+            // make sure that power is between minSpeed and maxSpeed
+            power = Range.clip(power, minSpeed, maxSpeed);
+
+            // set the power of the motors to power
+            setEqualPower("drive", power);
+
         }
 
+        // turn off run to position by setting the drive motors to run with encoders
         setDriveMode("withEncode");
 
-        FLDrive.setPower(0);
-        FRDrive.setPower(0);
-        BLDrive.setPower(0);
-        BRDrive.setPower(0);
+        // set power of drive motors to zero
+        setEqualPower("drive", 0);
 
     }
 
 
-    /* TeleOp */
-    /*--------------------------------------------------------------------------------------------*/
+    /** TeleOp */
+    /**-------------------------------------------------------------------------------------------*/
+
+    // mecanum drive for teleOp, input:
+    // G1RX (gamepad right stick x),
+    // G1RY (gamepad right stick y),
+    // G1LX (gamepad left stick x),
+    // G1LT (gamepad left stick trigger),
+    // powerScale (what % of power to give when trigger pressed)
     public void mecanumDrive(double G1RX, double G1RY, double G1LX, double G1LT, double powerScale) {
 
+        // set up powerFactor variable
         double powerFactor;
 
+        // if trigger is pressed, set powerFactor to powerScale
+        // else set powerFactor to 1
         if (G1LT > 0) {
             powerFactor = powerScale;
         } else {
             powerFactor = 1;
         }
 
-        //set powers
+        // set powers
         FLDrive.setPower(Range.clip(powerFactor * (G1RX + G1RY + G1LX), -1, 1));
         FRDrive.setPower(Range.clip(powerFactor * (G1RX - G1RY - G1LX), -1, 1));
         BLDrive.setPower(Range.clip(powerFactor * (G1RX - G1RY + G1LX), -1, 1));
